@@ -19,7 +19,7 @@ public class Spam {
 
   private String contentType = "";
 
-  private Object payload = "";
+  private String payload = "";
 
   private long delayMillis = 1000;
 
