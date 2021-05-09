@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +25,7 @@ import uk.co.nationwide.payments.test.spammer.models.Spam;
 
 @Slf4j
 @Service
-public class SpamService {
+public class SpamService implements Spammer {
 
   private final HttpClient client;
   private final Jackson2JsonEncoder jsonEncoder;
@@ -39,7 +38,7 @@ public class SpamService {
         .addShutdownHook(new Thread(() -> client.getConnectionManager().shutdown()));
   }
 
-  public void startSpamming(Spam spam) throws IOException, URISyntaxException, SpamException {
+  public void startSpamming(Spam spam) throws IOException, SpamException {
     HttpRequest postRequest = createRequest(spam);
 
     testFirstCall(spam, postRequest);
