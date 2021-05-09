@@ -35,7 +35,8 @@ public class SpamService {
   public SpamService(HttpClient client) {
     this.client = client;
     this.jsonEncoder = new Jackson2JsonEncoder();
-    Runtime.getRuntime().addShutdownHook(new Thread(() -> client.getConnectionManager().shutdown()));
+    Runtime.getRuntime()
+        .addShutdownHook(new Thread(() -> client.getConnectionManager().shutdown()));
   }
 
   public void startSpamming(Spam spam) throws IOException, URISyntaxException, SpamException {
@@ -43,7 +44,7 @@ public class SpamService {
 
     testFirstCall(spam, postRequest);
 
-    for (int i = 1 ; i < spam.getSpamCount() ; i++) {
+    for (int i = 1; i < spam.getSpamCount(); i++) {
       CompletableFuture.runAsync(() -> {
         try {
           makeNormalCall(spam, postRequest);
@@ -115,6 +116,4 @@ public class SpamService {
     }
     return request;
   }
-
-
 }
