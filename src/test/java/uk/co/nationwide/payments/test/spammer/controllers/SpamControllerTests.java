@@ -22,9 +22,47 @@ public class SpamControllerTests {
   private AutoCloseable closeable;
 
   @Test
+  public void noException() {
+    FakeSpammer fakeSpammer = new FakeSpammer();
+    SpamController controller = new SpamController(fakeSpammer);
+    Spam spam = new Spam("GET", "bob", "", 1, 23);
+
+    Map<String, String> result = controller.spam(response, spam);
+
+    assertThat(result).isEmpty();
+    verify(response, times(1)).setStatus(200);
+  }
+
+  @Test
   public void spamException() {
     FakeSpammer fakeSpammer = new FakeSpammer();
     fakeSpammer.throwSpam = true;
+    SpamController controller = new SpamController(fakeSpammer);
+    Spam spam = new Spam("GET", "bob", "", 1, 23);
+
+    Map<String, String> result = controller.spam(response, spam);
+
+    assertThat(result).containsKey("Exception");
+    verify(response, times(1)).setStatus(HttpServletResponse.SC_BAD_REQUEST);
+  }
+
+  @Test
+  public void ioException() {
+    FakeSpammer fakeSpammer = new FakeSpammer();
+    fakeSpammer.throwIO = true;
+    SpamController controller = new SpamController(fakeSpammer);
+    Spam spam = new Spam("GET", "bob", "", 1, 23);
+
+    Map<String, String> result = controller.spam(response, spam);
+
+    assertThat(result).containsKey("Exception");
+    verify(response, times(1)).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+  }
+
+  @Test
+  public void illegalArgumentException() {
+    FakeSpammer fakeSpammer = new FakeSpammer();
+    fakeSpammer.throwIllegalArgument = true;
     SpamController controller = new SpamController(fakeSpammer);
     Spam spam = new Spam("GET", "bob", "", 1, 23);
 

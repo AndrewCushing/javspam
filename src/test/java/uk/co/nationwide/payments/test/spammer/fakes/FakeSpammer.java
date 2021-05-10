@@ -8,7 +8,7 @@ import uk.co.nationwide.payments.test.spammer.services.Spammer;
 public class FakeSpammer implements Spammer {
 
   public boolean throwIO = false;
-  public boolean throwUriSyntax = false;
+  public boolean throwIllegalArgument = false;
   public boolean throwSpam = false;
 
   @Override
@@ -18,5 +18,8 @@ public class FakeSpammer implements Spammer {
 
     if (throwSpam)
       throw new SpamException("spam");
+
+    if (throwIllegalArgument)
+      throw new IllegalArgumentException();
   }
 }

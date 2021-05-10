@@ -13,29 +13,26 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.stereotype.Service;
 import uk.co.nationwide.payments.test.spammer.exceptions.SpamException;
+import uk.co.nationwide.payments.test.spammer.factories.ClientFactory;
 import uk.co.nationwide.payments.test.spammer.models.Spam;
 
 @Slf4j
 @Service
 public class SpamService implements Spammer {
 
-  private final HttpClient client;
   private final Jackson2JsonEncoder jsonEncoder;
+  private final ClientFactory clientFactory;
 
   @Autowired
-  public SpamService(HttpClient client) {
-    this.client = client;
+  public SpamService(ClientFactory clientFactory) {
+    this.clientFactory = clientFactory;
     this.jsonEncoder = new Jackson2JsonEncoder();
-    Runtime.getRuntime()
-        .addShutdownHook(new Thread(() -> client.getConnectionManager().shutdown()));
   }
 
   public void startSpamming(Spam spam) throws IOException, SpamException {
@@ -55,22 +52,21 @@ public class SpamService implements Spammer {
   }
 
   private void testFirstCall(Spam spam, HttpRequest request) throws IOException, SpamException {
-    var response = client.execute(HttpHost.create(spam.getHost()), request);
+    var response = clientFactory.getClient().execute(HttpHost.create(spam.getHost()), request);
     HttpEntity entity = response.getEntity();
 
+    if (spam.getExpectedStatusCode() == -1 ||
+        response.getStatusLine().getStatusCode() != spam.getExpectedStatusCode()) {
+      throw new SpamException(String
+          .format(
+              "Response from first call had status code of %s %s, which was not the expected %s",
+              response.getStatusLine().getStatusCode(),
+              response.getStatusLine().getReasonPhrase(),
+              spam.getExpectedStatusCode()));
+    }
+
     if (entity != null) {
-
       try (InputStream entityStream = entity.getContent()) {
-        if (spam.getExpectedStatusCode() == -1 ||
-            response.getStatusLine().getStatusCode() != spam.getExpectedStatusCode()) {
-          throw new SpamException(String
-              .format(
-                  "Response from first call had status code of %s %s, which was not the expected %s",
-                  response.getStatusLine().getStatusCode(),
-                  response.getStatusLine().getReasonPhrase(),
-                  spam.getExpectedStatusCode()));
-        }
-
         BufferedReader reader = new BufferedReader(
             new InputStreamReader(entityStream));
         System.out.println("Content in response from test request: " +
@@ -80,8 +76,8 @@ public class SpamService implements Spammer {
   }
 
   private void makeNormalCall(Spam spam, HttpRequest request) throws IOException {
-    DefaultHttpClient client = new DefaultHttpClient();
-    HttpResponse response = client.execute(HttpHost.create(spam.getHost()), request);
+    HttpResponse response = clientFactory.getClient()
+        .execute(HttpHost.create(spam.getHost()), request);
 
     HttpEntity entity = response.getEntity();
 
