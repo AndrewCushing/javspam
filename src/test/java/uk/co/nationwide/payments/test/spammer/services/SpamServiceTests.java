@@ -30,7 +30,7 @@ import uk.co.nationwide.payments.test.spammer.exceptions.SpamException;
 import uk.co.nationwide.payments.test.spammer.fakes.FakeClientFactory;
 import uk.co.nationwide.payments.test.spammer.models.Spam;
 
-public class SpamServiceTests {
+class SpamServiceTests {
 
   private AutoCloseable closeable;
 
@@ -41,7 +41,7 @@ public class SpamServiceTests {
   private ClientConnectionManager connectionManager;
 
   @Test
-  public void testCallFails_wrongStatusCode_exceptionReThrown() throws IOException {
+  void testCallFails_wrongStatusCode_exceptionReThrown() throws IOException {
     Spam spam = new Spam("GET", "http://localhost:8080", "", 50, 123);
     SpamService service = new SpamService(new FakeClientFactory(httpClient));
     BasicHttpResponse response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("http", 1, 1), 51, "Blah"));
@@ -53,7 +53,7 @@ public class SpamServiceTests {
   }
 
   @Test
-  public void testCallSucceeds_makesAllCalls()
+  void testCallSucceeds_makesAllCalls()
       throws IOException, InterruptedException, ExecutionException {
     Spam spam = new Spam("GET", "http://localhost:8080", "", 50, 123);
     spam.setDelayMillis(1);

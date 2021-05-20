@@ -14,7 +14,7 @@ import org.mockito.MockitoAnnotations;
 import uk.co.nationwide.payments.test.spammer.fakes.FakeSpammer;
 import uk.co.nationwide.payments.test.spammer.models.Spam;
 
-public class SpamControllerTests {
+class SpamControllerTests {
 
   @Mock
   private HttpServletResponse response;
@@ -22,7 +22,7 @@ public class SpamControllerTests {
   private AutoCloseable closeable;
 
   @Test
-  public void noException() {
+  void noException() {
     FakeSpammer fakeSpammer = new FakeSpammer();
     SpamController controller = new SpamController(fakeSpammer);
     Spam spam = new Spam("GET", "bob", "", 1, 23);
@@ -34,7 +34,7 @@ public class SpamControllerTests {
   }
 
   @Test
-  public void spamException() {
+  void spamException() {
     FakeSpammer fakeSpammer = new FakeSpammer();
     fakeSpammer.throwSpam = true;
     SpamController controller = new SpamController(fakeSpammer);
@@ -47,7 +47,7 @@ public class SpamControllerTests {
   }
 
   @Test
-  public void ioException() {
+  void ioException() {
     FakeSpammer fakeSpammer = new FakeSpammer();
     fakeSpammer.throwIO = true;
     SpamController controller = new SpamController(fakeSpammer);
@@ -60,7 +60,7 @@ public class SpamControllerTests {
   }
 
   @Test
-  public void illegalArgumentException() {
+  void illegalArgumentException() {
     FakeSpammer fakeSpammer = new FakeSpammer();
     fakeSpammer.throwIllegalArgument = true;
     SpamController controller = new SpamController(fakeSpammer);
@@ -73,12 +73,12 @@ public class SpamControllerTests {
   }
 
   @BeforeEach
-  public void openMocks() {
+  void openMocks() {
     closeable = MockitoAnnotations.openMocks(this);
   }
 
   @AfterEach
-  public void releaseMocks() throws Exception {
+  void releaseMocks() throws Exception {
     closeable.close();
   }
 }

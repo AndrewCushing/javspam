@@ -31,7 +31,7 @@ public class Spam {
 
   /**
    * Http Status code which is expected. This is only verified in the first test call, then the
-   * status code isn't inspected
+   * status code isn't inspected. Set to -1 if you don't care
    */
   private final int expectedStatusCode;
 
@@ -41,9 +41,19 @@ public class Spam {
   private String contentType = "";
 
   /**
-   * Body of the Http request
+   * Body of the Http request as a string
    */
-  private String payload = "";
+  private String stringPayload = "";
+
+  /**
+   * Body of the Http request as an object
+   */
+  private Map<String, Object> objectPayload;
+
+  /**
+   * Whether or not to url encode the payload
+   */
+  private boolean urlEncodePayload = false;
 
   /**
    * How long to wait between sending each message
